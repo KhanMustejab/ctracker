@@ -358,38 +358,16 @@ function calculateCompletionPercentage(habit) {
 }
 
 /**
- * Get days to display (capped at habit duration or 21 days, whichever is smaller)
+ * Get all days in the habit range
  */
 function getDaysToDisplay(habit) {
     const daysDiff = calculateDaysDifference(habit.startDate, habit.endDate) + 1;
-    
-    // Show all days in the range, but cap at 21 days for UI reasons
-    // If range is <= 21 days, show all. Otherwise show last 21 days.
-    let daysToShow;
-    let startDate;
-    
-    if (daysDiff <= 21) {
-        daysToShow = daysDiff;
-        startDate = getDateFromString(habit.startDate);
-    } else {
-        daysToShow = 21;
-        // Calculate which date was 21 days ago from end date
-        const endDate = getDateFromString(habit.endDate);
-        startDate = new Date(endDate);
-        startDate.setDate(startDate.getDate() - 20);
-    }
-    
     const days = [];
-    let currentDate = new Date(startDate);
+    let currentDate = getDateFromString(habit.startDate);
     
-    for (let i = 0; i < daysToShow; i++) {
+    for (let i = 0; i < daysDiff; i++) {
         const dateStr = getDateString(currentDate);
-        
-        // Only include if within habit range
-        if (isDateWithinRange(habit, dateStr)) {
-            days.push(dateStr);
-        }
-        
+        days.push(dateStr);
         currentDate.setDate(currentDate.getDate() + 1);
     }
     
@@ -535,13 +513,9 @@ function renderHabit(habit) {
     const daysToShow = getDaysToDisplay(habit);
     const today = getTodayDateString();
     
-    // Update days label dynamically
-    const totalDaysInRange = calculateDaysDifference(habit.startDate, habit.endDate) + 1;
-    if (totalDaysInRange <= 21) {
-        daysLabelText.textContent = `All ${totalDaysInRange} days`;
-    } else {
-        daysLabelText.textContent = `Last 21 of ${totalDaysInRange} days`;
-    }
+    // Update days label to show total days
+    const totalDaysInRange = daysToShow.length;
+    daysLabelText.textContent = `${totalDaysInRange} days`;
     
     daysToShow.forEach(dateStr => {
         const dayBox = document.createElement('div');
