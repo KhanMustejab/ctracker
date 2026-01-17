@@ -655,6 +655,22 @@ function attachEventListeners() {
 // INITIALIZATION
 // ===================================
 
+let lastKnownDate = getTodayDateString();
+
+/**
+ * Setup automatic refresh when date changes (at midnight)
+ */
+function setupMidnightRefresh() {
+    setInterval(() => {
+        const currentDate = getTodayDateString();
+        if (currentDate !== lastKnownDate) {
+            lastKnownDate = currentDate;
+            console.log('Date changed, refreshing app...');
+            renderHabits();
+        }
+    }, 60000); // Check every minute
+}
+
 /**
  * Initialize the app on page load
  */
@@ -670,6 +686,9 @@ function initApp() {
     
     renderHabits();
     habitInput.focus();
+    
+    // Setup automatic refresh at midnight
+    setupMidnightRefresh();
 }
 
 // Start the app
