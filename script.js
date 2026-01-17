@@ -158,6 +158,8 @@ function createHabit(name, startDateStr, endDateStr) {
     };
     habits.push(newHabit);
     saveHabits(habits);
+    console.log('Habit created:', newHabit);
+    console.log('All habits:', getHabits());
     return { success: true, habit: newHabit };
 }
 
@@ -439,6 +441,7 @@ function hideForm() {
  */
 function renderHabits() {
     const habits = getHabits();
+    console.log('Rendering habits:', habits);
     
     habitsList.innerHTML = '';
     
@@ -588,9 +591,12 @@ function attachEventListeners() {
      * Create habit with validation
      */
     confirmAddBtn.addEventListener('click', () => {
+        console.log('Create button clicked');
         const habitName = habitNameInput.value.trim();
         const startDate = startDateInput.value;
         const endDate = endDateInput.value;
+        
+        console.log('Form values:', { habitName, startDate, endDate });
         
         if (!habitName) {
             dateError.textContent = 'Please enter a habit name';
@@ -606,6 +612,7 @@ function attachEventListeners() {
         }
         
         const result = createHabit(habitName, startDate, endDate);
+        console.log('Create result:', result);
         
         if (!result.success) {
             dateError.textContent = result.error;
@@ -613,6 +620,7 @@ function attachEventListeners() {
             return;
         }
         
+        console.log('Hiding form and rendering...');
         hideForm();
         renderHabits();
     });
