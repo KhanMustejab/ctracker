@@ -115,7 +115,7 @@ function validateDateRange(startDateStr, endDateStr) {
 }
 
 /**
- * Migrate existing habits without dates
+ * Migrate existing habits without dates and ensure all properties exist
  */
 function migrateHabits() {
     const habits = getHabits();
@@ -123,17 +123,19 @@ function migrateHabits() {
     const endDate = addDaysToDate(today, 21);
     
     const updated = habits.map(habit => {
-        if (!habit.startDate || !habit.endDate) {
-            return {
-                ...habit,
-                startDate: today,
-                endDate: endDate
-            };
-        }
-        return habit;
+        const migratedHabit = {
+            id: habit.id || Date.now().toString(),
+            name: habit.name || 'Unnamed Habit',
+            startDate: habit.startDate || today,
+            endDate: habit.endDate || endDate,
+            createdAt: habit.createdAt || new Date().toISOString(),
+            completionDates: habit.completionDates || []
+        };
+        return migratedHabit;
     });
 
     if (JSON.stringify(habits) !== JSON.stringify(updated)) {
+        console.log('Migrating habits...');
         saveHabits(updated);
     }
 }
@@ -181,6 +183,11 @@ function toggleHabitCompletion(habitId, dateStr) {
     
     if (!habit) return;
     
+    // Ensure completionDates exists
+    if (!habit.completionDates || !Array.isArray(habit.completionDates)) {
+        habit.completionDates = [];
+    }
+    
     const index = habit.completionDates.indexOf(dateStr);
     if (index > -1) {
         habit.completionDates.splice(index, 1);
@@ -195,6 +202,9 @@ function toggleHabitCompletion(habitId, dateStr) {
  * Check if a habit was completed on a specific date
  */
 function isHabitCompletedOnDate(habit, dateStr) {
+    if (!habit || !habit.completionDates || !Array.isArray(habit.completionDates)) {
+        return false;
+    }
     return habit.completionDates.includes(dateStr);
 }
 
@@ -291,6 +301,10 @@ function calculateCurrentStreak(habit) {
  * Calculate longest streak for a habit (within date range)
  */
 function calculateLongestStreak(habit) {
+    if (!habit.completionDates || !Array.isArray(habit.completionDates)) {
+        return 0;
+    }
+    
     const datesInRange = habit.completionDates.filter(date => 
         isDateWithinRange(habit, date)
     );
@@ -323,6 +337,10 @@ function calculateLongestStreak(habit) {
  * Calculate total completed days within date range
  */
 function calculateTotalCompleted(habit) {
+    if (!habit.completionDates || !Array.isArray(habit.completionDates)) {
+        return 0;
+    }
+    
     return habit.completionDates.filter(date => 
         isDateWithinRange(habit, date)
     ).length;
