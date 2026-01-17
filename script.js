@@ -368,18 +368,36 @@ function getDaysToDisplay(habit) {
 // DOM MANIPULATION & RENDERING
 // ===================================
 
-const habitInput = document.getElementById('habitInput');
-const quickAddBtn = document.getElementById('quickAddBtn');
-const habitNameInput = document.getElementById('habitNameInput');
-const startDateInput = document.getElementById('startDate');
-const endDateInput = document.getElementById('endDate');
-const confirmAddBtn = document.getElementById('confirmAddBtn');
-const closeFormBtn = document.getElementById('closeFormBtn');
-const dateError = document.getElementById('dateError');
-const expandedForm = document.getElementById('expandedForm');
-const habitsList = document.getElementById('habitsList');
-const emptyState = document.getElementById('emptyState');
-const habitTemplate = document.getElementById('habitTemplate');
+let habitInput;
+let quickAddBtn;
+let habitNameInput;
+let startDateInput;
+let endDateInput;
+let confirmAddBtn;
+let closeFormBtn;
+let dateError;
+let expandedForm;
+let habitsList;
+let emptyState;
+let habitTemplate;
+
+/**
+ * Initialize DOM references after page loads
+ */
+function initDOMReferences() {
+    habitInput = document.getElementById('habitInput');
+    quickAddBtn = document.getElementById('quickAddBtn');
+    habitNameInput = document.getElementById('habitNameInput');
+    startDateInput = document.getElementById('startDate');
+    endDateInput = document.getElementById('endDate');
+    confirmAddBtn = document.getElementById('confirmAddBtn');
+    closeFormBtn = document.getElementById('closeFormBtn');
+    dateError = document.getElementById('dateError');
+    expandedForm = document.getElementById('expandedForm');
+    habitsList = document.getElementById('habitsList');
+    emptyState = document.getElementById('emptyState');
+    habitTemplate = document.getElementById('habitTemplate');
+}
 
 /**
  * Set default dates on form open
@@ -548,70 +566,75 @@ function renderHabit(habit) {
 // ===================================
 
 /**
- * Show form when clicking quick add button
+ * Attach all event listeners
  */
-quickAddBtn.addEventListener('click', () => {
-    const habitName = habitInput.value.trim();
-    showForm(habitName);
-});
+function attachEventListeners() {
+    /**
+     * Show form when clicking quick add button
+     */
+    quickAddBtn.addEventListener('click', () => {
+        const habitName = habitInput.value.trim();
+        showForm(habitName);
+    });
 
-/**
- * Close form when clicking cancel
- */
-closeFormBtn.addEventListener('click', () => {
-    hideForm();
-});
+    /**
+     * Close form when clicking cancel
+     */
+    closeFormBtn.addEventListener('click', () => {
+        hideForm();
+    });
 
-/**
- * Create habit with validation
- */
-confirmAddBtn.addEventListener('click', () => {
-    const habitName = habitNameInput.value.trim();
-    const startDate = startDateInput.value;
-    const endDate = endDateInput.value;
-    
-    if (!habitName) {
-        dateError.textContent = 'Please enter a habit name';
-        dateError.style.display = 'block';
-        habitNameInput.focus();
-        return;
-    }
-    
-    if (!startDate || !endDate) {
-        dateError.textContent = 'Please select both start and end dates';
-        dateError.style.display = 'block';
-        return;
-    }
-    
-    const result = createHabit(habitName, startDate, endDate);
-    
-    if (!result.success) {
-        dateError.textContent = result.error;
-        dateError.style.display = 'block';
-        return;
-    }
-    
-    hideForm();
-    renderHabits();
-});
+    /**
+     * Create habit with validation
+     */
+    confirmAddBtn.addEventListener('click', () => {
+        const habitName = habitNameInput.value.trim();
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+        
+        if (!habitName) {
+            dateError.textContent = 'Please enter a habit name';
+            dateError.style.display = 'block';
+            habitNameInput.focus();
+            return;
+        }
+        
+        if (!startDate || !endDate) {
+            dateError.textContent = 'Please select both start and end dates';
+            dateError.style.display = 'block';
+            return;
+        }
+        
+        const result = createHabit(habitName, startDate, endDate);
+        
+        if (!result.success) {
+            dateError.textContent = result.error;
+            dateError.style.display = 'block';
+            return;
+        }
+        
+        hideForm();
+        renderHabits();
+    });
 
-/**
- * Allow Enter key to submit in habit name input
- */
-habitInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        quickAddBtn.click();
-    }
-});
+    /**
+     * Allow Enter key to submit in habit name input
+     */
+    habitInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            quickAddBtn.click();
+        }
+    });
 
-/**
- * Allow Enter key to submit in habit name input (expanded form)
- */
-habitNameInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        startDateInput.focus();
-    }
-});
+    /**
+     * Allow Enter key to submit in habit name input (expanded form)
+     */
+    habitNameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            startDateInput.focus();
+        }
+    });
+}
 
 // ===================================
 // INITIALIZATION
@@ -621,6 +644,12 @@ habitNameInput.addEventListener('keypress', (e) => {
  * Initialize the app on page load
  */
 function initApp() {
+    // Initialize DOM references
+    initDOMReferences();
+    
+    // Attach event listeners
+    attachEventListeners();
+    
     // Migrate existing habits without dates
     migrateHabits();
     
