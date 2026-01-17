@@ -135,7 +135,6 @@ function migrateHabits() {
     });
 
     if (JSON.stringify(habits) !== JSON.stringify(updated)) {
-        console.log('Migrating habits...');
         saveHabits(updated);
     }
 }
@@ -160,8 +159,6 @@ function createHabit(name, startDateStr, endDateStr) {
     };
     habits.push(newHabit);
     saveHabits(habits);
-    console.log('Habit created:', newHabit);
-    console.log('All habits:', getHabits());
     return { success: true, habit: newHabit };
 }
 
@@ -361,24 +358,39 @@ function calculateCompletionPercentage(habit) {
 }
 
 /**
- * Get days to display (capped at 21 days or the range, whichever is smaller)
+ * Get days to display (capped at habit duration or 21 days, whichever is smaller)
  */
 function getDaysToDisplay(habit) {
     const daysDiff = calculateDaysDifference(habit.startDate, habit.endDate) + 1;
-    const daysToShow = Math.min(21, daysDiff);
+    
+    // Show all days in the range, but cap at 21 days for UI reasons
+    // If range is <= 21 days, show all. Otherwise show last 21 days.
+    let daysToShow;
+    let startDate;
+    
+    if (daysDiff <= 21) {
+        daysToShow = daysDiff;
+        startDate = getDateFromString(habit.startDate);
+    } else {
+        daysToShow = 21;
+        // Calculate which date was 21 days ago from end date
+        const endDate = getDateFromString(habit.endDate);
+        startDate = new Date(endDate);
+        startDate.setDate(startDate.getDate() - 20);
+    }
     
     const days = [];
-    const endDate = getDateFromString(habit.endDate);
+    let currentDate = new Date(startDate);
     
-    for (let i = daysToShow - 1; i >= 0; i--) {
-        const date = new Date(endDate);
-        date.setDate(date.getDate() - i);
-        const dateStr = getDateString(date);
+    for (let i = 0; i < daysToShow; i++) {
+        const dateStr = getDateString(currentDate);
         
         // Only include if within habit range
         if (isDateWithinRange(habit, dateStr)) {
             days.push(dateStr);
         }
+        
+        currentDate.setDate(currentDate.getDate() + 1);
     }
     
     return days;
@@ -459,7 +471,6 @@ function hideForm() {
  */
 function renderHabits() {
     const habits = getHabits();
-    console.log('Rendering habits:', habits);
     
     habitsList.innerHTML = '';
     
@@ -520,8 +531,17 @@ function renderHabit(habit) {
     
     // Render days grid
     const daysGrid = card.querySelector('.days-grid');
+    const daysLabelText = card.querySelector('.days-label-text');
     const daysToShow = getDaysToDisplay(habit);
     const today = getTodayDateString();
+    
+    // Update days label dynamically
+    const totalDaysInRange = calculateDaysDifference(habit.startDate, habit.endDate) + 1;
+    if (totalDaysInRange <= 21) {
+        daysLabelText.textContent = `All ${totalDaysInRange} days`;
+    } else {
+        daysLabelText.textContent = `Last 21 of ${totalDaysInRange} days`;
+    }
     
     daysToShow.forEach(dateStr => {
         const dayBox = document.createElement('div');
@@ -609,12 +629,9 @@ function attachEventListeners() {
      * Create habit with validation
      */
     confirmAddBtn.addEventListener('click', () => {
-        console.log('Create button clicked');
         const habitName = habitNameInput.value.trim();
         const startDate = startDateInput.value;
         const endDate = endDateInput.value;
-        
-        console.log('Form values:', { habitName, startDate, endDate });
         
         if (!habitName) {
             dateError.textContent = 'Please enter a habit name';
@@ -630,7 +647,6 @@ function attachEventListeners() {
         }
         
         const result = createHabit(habitName, startDate, endDate);
-        console.log('Create result:', result);
         
         if (!result.success) {
             dateError.textContent = result.error;
@@ -638,7 +654,6 @@ function attachEventListeners() {
             return;
         }
         
-        console.log('Hiding form and rendering...');
         hideForm();
         renderHabits();
     });
