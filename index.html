@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consistency Tracker - Build Daily Habits</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="header-title">Consistency Tracker</h1>
+            <p class="header-subtitle">Build streaks, not excuses</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Add Habit Section -->
+            <section class="add-habit-section">
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        id="habitInput" 
+                        class="habit-input" 
+                        placeholder="Add a new habit..." 
+                        aria-label="New habit name"
+                    >
+                    <button id="addHabitBtn" class="btn btn-primary" aria-label="Add habit">
+                        <span class="btn-icon">+</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Habits List -->
+            <section class="habits-section">
+                <div id="habitsList" class="habits-list">
+                    <!-- Habits will be dynamically inserted here -->
+                </div>
+                <div id="emptyState" class="empty-state">
+                    <p>No habits yet. Create your first one above! 🚀</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Habit Template (hidden, used for cloning) -->
+    <template id="habitTemplate">
+        <div class="habit-card">
+            <div class="habit-header">
+                <h2 class="habit-name"></h2>
+                <button class="btn btn-delete" aria-label="Delete habit">
+                    <span class="btn-icon">✕</span>
+                </button>
+            </div>
+
+            <div class="habit-stats">
+                <div class="stat">
+                    <span class="stat-label">Current Streak</span>
+                    <span class="stat-value current-streak">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Best Streak</span>
+                    <span class="stat-value best-streak">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Completed</span>
+                    <span class="stat-value total-completed">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Success %</span>
+                    <span class="stat-value completion-percentage">0%</span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-bar-container">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- Last 21 Days View -->
+            <div class="days-view">
+                <p class="days-label">Last 21 days</p>
+                <div class="days-grid"></div>
+            </div>
+
+            <!-- Today's Toggle -->
+            <div class="today-toggle">
+                <label class="checkbox-label">
+                    <input type="checkbox" class="today-checkbox" aria-label="Mark today as done">
+                    <span class="checkbox-text">Done today</span>
+                </label>
+            </div>
+        </div>
+    </template>
+
+    <script src="script.js"></script>
+</body>
+</html>

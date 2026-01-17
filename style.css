@@ -1,0 +1,440 @@
+/* ===================================
+   MOBILE-FIRST CONSISTENCY TRACKER
+   ==================================== */
+
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #333;
+    min-height: 100vh;
+    padding: 0;
+    margin: 0;
+}
+
+/* App Container */
+.app-container {
+    max-width: 600px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+}
+
+.header-subtitle {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    font-weight: 400;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 2rem;
+}
+
+/* Add Habit Section */
+.add-habit-section {
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.input-group {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.habit-input {
+    flex: 1;
+    padding: 0.875rem 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.habit-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.habit-input::placeholder {
+    color: #999;
+}
+
+/* Buttons */
+.btn {
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.875rem 1rem;
+    font-family: inherit;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    width: 3rem;
+    min-width: 3rem;
+    padding: 0.875rem;
+}
+
+.btn-primary:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-delete {
+    background: #fee;
+    color: #d32f2f;
+    width: 2.5rem;
+    min-width: 2.5rem;
+    padding: 0.5rem;
+    border-radius: 6px;
+}
+
+.btn-delete:active {
+    background: #fdd;
+    transform: scale(0.95);
+}
+
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: #999;
+}
+
+.empty-state p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+/* Habits Section */
+.habits-section {
+    padding: 1.5rem;
+}
+
+.habits-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Habit Card */
+.habit-card {
+    background: white;
+    border: 2px solid #f0f0f0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.habit-card:active {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.habit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.habit-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    word-break: break-word;
+    flex: 1;
+    margin: 0;
+}
+
+/* Habit Stats */
+.habit-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #999;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #667eea;
+}
+
+/* Progress Bar */
+.progress-bar-container {
+    margin-bottom: 1.5rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+/* Days Grid */
+.days-label {
+    font-size: 0.8rem;
+    color: #999;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    margin-top: 0;
+}
+
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.day-box {
+    aspect-ratio: 1;
+    background: #f0f0f0;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: #999;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.day-box.completed {
+    background: #4caf50;
+    color: white;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.day-box.missed {
+    background: #e0e0e0;
+    color: #999;
+}
+
+/* Today Toggle */
+.today-toggle {
+    padding-top: 1rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.today-checkbox {
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+    accent-color: #667eea;
+}
+
+.checkbox-text {
+    font-weight: 500;
+    color: #333;
+    font-size: 1rem;
+}
+
+/* Responsive Design - Tablet and Up */
+@media (min-width: 768px) {
+    .app-container {
+        max-width: 800px;
+    }
+
+    .header {
+        padding: 2.5rem 2rem;
+    }
+
+    .header-title {
+        font-size: 2.5rem;
+    }
+
+    .habit-stats {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.25rem;
+    }
+
+    .habits-list {
+        gap: 2rem;
+    }
+
+    .add-habit-section {
+        padding: 2rem;
+    }
+
+    .habits-section {
+        padding: 2rem;
+    }
+
+    .habit-card {
+        padding: 2rem;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+    }
+}
+
+/* Landscape Mobile Optimization */
+@media (max-height: 600px) and (orientation: landscape) {
+    .header {
+        padding: 1rem 1.5rem;
+    }
+
+    .header-title {
+        font-size: 1.5rem;
+        margin-bottom: 0;
+    }
+
+    .header-subtitle {
+        display: none;
+    }
+
+    .habit-stats {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.75rem;
+        padding-bottom: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .stat-value {
+        font-size: 1rem;
+    }
+
+    .days-grid {
+        gap: 0.35rem;
+        margin-bottom: 1rem;
+    }
+
+    .day-box {
+        font-size: 0.6rem;
+    }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+/* Print Styles */
+@media print {
+    body {
+        background: white;
+    }
+
+    .app-container {
+        box-shadow: none;
+        max-width: 100%;
+    }
+
+    .header {
+        page-break-after: avoid;
+    }
+
+    .habit-card {
+        page-break-inside: avoid;
+    }
+}
