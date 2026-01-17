@@ -106,11 +106,16 @@ body {
 /* Expanded Form */
 .expanded-form {
     margin-top: 1rem;
-    padding: 1rem;
+    padding: 1.25rem;
     background: white;
     border: 2px solid #e9ecef;
     border-radius: 8px;
+    display: block;
     animation: slideDown 0.3s ease;
+}
+
+.expanded-form.hidden {
+    display: none;
 }
 
 @keyframes slideDown {
@@ -122,6 +127,13 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+.form-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 1rem 0;
 }
 
 .form-group {
@@ -149,13 +161,21 @@ body {
     border-radius: 6px;
     font-size: 1rem;
     font-family: inherit;
-    transition: border-color 0.3s ease;
+    transition: border-color 0.3s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }
 
 .form-input:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-input[type="date"] {
+    cursor: pointer;
 }
 
 .form-error {

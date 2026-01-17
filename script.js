@@ -369,11 +369,12 @@ function getDaysToDisplay(habit) {
 // ===================================
 
 const habitInput = document.getElementById('habitInput');
-const addHabitBtn = document.getElementById('addHabitBtn');
+const quickAddBtn = document.getElementById('quickAddBtn');
+const habitNameInput = document.getElementById('habitNameInput');
 const startDateInput = document.getElementById('startDate');
 const endDateInput = document.getElementById('endDate');
 const confirmAddBtn = document.getElementById('confirmAddBtn');
-const cancelAddBtn = document.getElementById('cancelAddBtn');
+const closeFormBtn = document.getElementById('closeFormBtn');
 const dateError = document.getElementById('dateError');
 const expandedForm = document.getElementById('expandedForm');
 const habitsList = document.getElementById('habitsList');
@@ -393,14 +394,26 @@ function setDefaultDates() {
 }
 
 /**
- * Toggle expanded form visibility
+ * Show form with pre-filled habit name
  */
-function toggleExpandedForm(show) {
-    expandedForm.style.display = show ? 'block' : 'none';
-    if (show) {
-        setDefaultDates();
-        habitInput.focus();
-    }
+function showForm(habitName = '') {
+    habitNameInput.value = habitName;
+    setDefaultDates();
+    expandedForm.classList.remove('hidden');
+    // Focus on habit name if empty, otherwise on start date
+    (habitName ? startDateInput : habitNameInput).focus();
+}
+
+/**
+ * Hide form
+ */
+function hideForm() {
+    expandedForm.classList.add('hidden');
+    habitInput.value = '';
+    habitNameInput.value = '';
+    dateError.textContent = '';
+    dateError.style.display = 'none';
+    habitInput.focus();
 }
 
 /**
@@ -535,34 +548,37 @@ function renderHabit(habit) {
 // ===================================
 
 /**
- * Open expanded form when clicking add button
+ * Show form when clicking quick add button
  */
-addHabitBtn.addEventListener('click', () => {
-    toggleExpandedForm(true);
+quickAddBtn.addEventListener('click', () => {
+    const habitName = habitInput.value.trim();
+    showForm(habitName);
 });
 
 /**
- * Close expanded form when clicking cancel
+ * Close form when clicking cancel
  */
-cancelAddBtn.addEventListener('click', () => {
-    toggleExpandedForm(false);
+closeFormBtn.addEventListener('click', () => {
+    hideForm();
 });
 
 /**
  * Create habit with validation
  */
 confirmAddBtn.addEventListener('click', () => {
-    const habitName = habitInput.value.trim();
+    const habitName = habitNameInput.value.trim();
     const startDate = startDateInput.value;
     const endDate = endDateInput.value;
     
     if (!habitName) {
-        habitInput.focus();
+        dateError.textContent = 'Please enter a habit name';
+        dateError.style.display = 'block';
+        habitNameInput.focus();
         return;
     }
     
     if (!startDate || !endDate) {
-        dateError.textContent = 'Please fill in both dates';
+        dateError.textContent = 'Please select both start and end dates';
         dateError.style.display = 'block';
         return;
     }
@@ -575,19 +591,25 @@ confirmAddBtn.addEventListener('click', () => {
         return;
     }
     
-    habitInput.value = '';
-    toggleExpandedForm(false);
+    hideForm();
     renderHabits();
 });
 
 /**
- * Allow Enter key to submit in habit input
+ * Allow Enter key to submit in habit name input
  */
 habitInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
-        if (expandedForm.style.display === 'none') {
-            addHabitBtn.click();
-        }
+        quickAddBtn.click();
+    }
+});
+
+/**
+ * Allow Enter key to submit in habit name input (expanded form)
+ */
+habitNameInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        startDateInput.focus();
     }
 });
 

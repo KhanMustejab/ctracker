@@ -18,54 +18,64 @@
         <main class="main-content">
             <!-- Add Habit Section -->
             <section class="add-habit-section">
-                <div id="addHabitForm" class="add-habit-form">
-                    <div class="input-group">
+                <!-- Simple input row -->
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        id="habitInput" 
+                        class="habit-input" 
+                        placeholder="Habit name..." 
+                        aria-label="New habit name"
+                    >
+                    <button id="quickAddBtn" class="btn btn-primary" aria-label="Quick add with default dates">
+                        <span class="btn-icon">+</span>
+                    </button>
+                </div>
+
+                <!-- Expanded form with date inputs -->
+                <div id="expandedForm" class="expanded-form hidden">
+                    <h3 class="form-title">Create Habit</h3>
+                    
+                    <div class="form-group">
+                        <label for="habitNameInput" class="form-label">Habit Name *</label>
                         <input 
                             type="text" 
-                            id="habitInput" 
-                            class="habit-input" 
-                            placeholder="Add a new habit..." 
-                            aria-label="New habit name"
+                            id="habitNameInput" 
+                            class="form-input" 
+                            placeholder="e.g., Morning Run, Reading"
+                            aria-label="Habit name"
                         >
-                        <button id="addHabitBtn" class="btn btn-primary" aria-label="Add habit">
-                            <span class="btn-icon">+</span>
-                        </button>
                     </div>
 
-                    <!-- Expanded form (hidden by default) -->
-                    <div id="expandedForm" class="expanded-form" style="display: none;">
-                        <div class="form-group">
-                            <label for="startDate" class="form-label">Start Date *</label>
-                            <input 
-                                type="date" 
-                                id="startDate" 
-                                class="form-input" 
-                                aria-label="Habit start date"
-                                required
-                            >
-                        </div>
+                    <div class="form-group">
+                        <label for="startDate" class="form-label">Start Date *</label>
+                        <input 
+                            type="date" 
+                            id="startDate" 
+                            class="form-input" 
+                            aria-label="Habit start date"
+                        >
+                    </div>
 
-                        <div class="form-group">
-                            <label for="endDate" class="form-label">End Date *</label>
-                            <input 
-                                type="date" 
-                                id="endDate" 
-                                class="form-input" 
-                                aria-label="Habit end date"
-                                required
-                            >
-                        </div>
+                    <div class="form-group">
+                        <label for="endDate" class="form-label">End Date *</label>
+                        <input 
+                            type="date" 
+                            id="endDate" 
+                            class="form-input" 
+                            aria-label="Habit end date"
+                        >
+                    </div>
 
-                        <div id="dateError" class="form-error" style="display: none;"></div>
+                    <div id="dateError" class="form-error" style="display: none;"></div>
 
-                        <div class="form-actions">
-                            <button id="confirmAddBtn" class="btn btn-primary" aria-label="Confirm add habit">
-                                Create Habit
-                            </button>
-                            <button id="cancelAddBtn" class="btn btn-secondary" aria-label="Cancel adding habit">
-                                Cancel
-                            </button>
-                        </div>
+                    <div class="form-actions">
+                        <button id="confirmAddBtn" class="btn btn-primary" aria-label="Create habit">
+                            Create Habit
+                        </button>
+                        <button id="closeFormBtn" class="btn btn-secondary" aria-label="Close form">
+                            Cancel
+                        </button>
                     </div>
                 </div>
             </section>
