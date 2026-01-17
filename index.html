@@ -10,8 +10,8 @@
     <div class="app-container">
         <!-- Header -->
         <header class="header">
-            <h1 class="header-title">Consistency Tracker</h1>
-            <p class="header-subtitle">Build streaks, not excuses</p>
+            <h1 class="header-title">Task Tracker</h1>
+            <p class="header-subtitle">Complete tasks, build streaks</p>
         </header>
 
         <!-- Main Content -->
@@ -24,20 +24,20 @@
                         type="text" 
                         id="habitInput" 
                         class="habit-input" 
-                        placeholder="Habit name..." 
-                        aria-label="New habit name"
+                        placeholder="Task name..." 
+                        aria-label="New task name"
                     >
-                    <button id="quickAddBtn" class="btn btn-primary" aria-label="Quick add with default dates">
+                    <button id="quickAddBtn" class="btn btn-primary" aria-label="Add new task">
                         <span class="btn-icon">+</span>
                     </button>
                 </div>
 
                 <!-- Expanded form with date inputs -->
                 <div id="expandedForm" class="expanded-form hidden">
-                    <h3 class="form-title">Create Habit</h3>
+                    <h3 class="form-title">Create Task</h3>
                     
                     <div class="form-group">
-                        <label for="habitNameInput" class="form-label">Habit Name *</label>
+                        <label for="habitNameInput" class="form-label">Task Name *</label>
                         <input 
                             type="text" 
                             id="habitNameInput" 
@@ -53,7 +53,7 @@
                             type="date" 
                             id="startDate" 
                             class="form-input" 
-                            aria-label="Habit start date"
+                            aria-label="Task start date"
                         >
                     </div>
 
@@ -63,15 +63,15 @@
                             type="date" 
                             id="endDate" 
                             class="form-input" 
-                            aria-label="Habit end date"
+                            aria-label="Task end date"
                         >
                     </div>
 
                     <div id="dateError" class="form-error" style="display: none;"></div>
 
                     <div class="form-actions">
-                        <button id="confirmAddBtn" class="btn btn-primary" aria-label="Create habit">
-                            Create Habit
+                        <button id="confirmAddBtn" class="btn btn-primary" aria-label="Create task">
+                            Create Task
                         </button>
                         <button id="closeFormBtn" class="btn btn-secondary" aria-label="Close form">
                             Cancel
@@ -86,7 +86,7 @@
                     <!-- Habits will be dynamically inserted here -->
                 </div>
                 <div id="emptyState" class="empty-state">
-                    <p>No habits yet. Create your first one above! 🚀</p>
+                    <p>No tasks yet. Create your first one above! 🚀</p>
                 </div>
             </section>
         </main>
@@ -97,7 +97,7 @@
             <div class="habit-card">
             <div class="habit-header">
                 <h2 class="habit-name"></h2>
-                <button class="btn btn-delete" aria-label="Delete habit">
+                <button class="btn btn-delete" aria-label="Delete task">
                     <span class="btn-icon">✕</span>
                 </button>
             </div>
@@ -153,8 +153,8 @@
             <!-- Today's Toggle -->
             <div class="today-toggle">
                 <label class="checkbox-label">
-                    <input type="checkbox" class="today-checkbox" aria-label="Mark today as done">
-                    <span class="checkbox-text">Done today</span>
+                    <input type="checkbox" class="today-checkbox" aria-label="Mark task done today">
+                    <span class="checkbox-text">Completed today</span>
                 </label>
             </div>
         </div>

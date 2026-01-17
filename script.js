@@ -608,7 +608,7 @@ function attachEventListeners() {
         const endDate = endDateInput.value;
         
         if (!habitName) {
-            dateError.textContent = 'Please enter a habit name';
+            dateError.textContent = 'Please enter a task name';
             dateError.style.display = 'block';
             habitNameInput.focus();
             return;

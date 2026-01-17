@@ -1,13 +1,13 @@
 # Consistency Tracker 🎯
 
-A simple, mobile-first web app to track your daily habits and build streaks. No login required, no backend needed—all data is stored locally in your browser.
+A simple, mobile-first web app to track your daily tasks and build streaks. No login required, no backend needed—all data is stored locally in your browser.
 
 ## Features ✨
 
-- **Create & Manage Habits** - Add habits like "Namaz", "Gym", "Reading", etc.
-- **Daily Tracking** - Mark habits as done each day with a simple toggle
+- **Create & Manage Tasks** - Add tasks like "Morning Run", "Gym", "Reading", etc.
+- **Daily Tracking** - Mark tasks as done each day with a simple toggle
 - **Streak Tracking** - See your current streak, best streak, and completion percentage
-- **Visual Progress** - 21-day view with green (completed) and gray (missed) indicators
+- **Visual Progress** - Grid view with green (completed) and gray (missed) indicators
 - **Responsive Design** - Works perfectly on mobile, tablet, and desktop
 - **Persistent Storage** - All data saved in browser localStorage—survives browser restarts
 - **No Dependencies** - Pure HTML, CSS, and vanilla JavaScript
@@ -36,21 +36,23 @@ ctracker/
 
 ## How It Works 🔧
 
-### Adding a Habit
-1. Type a habit name in the input field (e.g., "Morning Jog")
+### Adding a Task
+1. Type a task name in the input field (e.g., "Morning Jog")
 2. Press Enter or tap the "+" button
-3. The habit appears as a new card
+3. Fill in start and end dates
+4. Click "Create Task"
+5. The task appears as a new card
 
 ### Tracking Daily Progress
-- **Today's Toggle**: Check the "Done today" box to mark the habit as completed today
-- **Past Days**: Click any day in the 21-day view to mark it complete/incomplete
+- **Today's Toggle**: Check the "Completed today" box to mark the task as completed today
+- **Past Days**: Click any day in the grid to mark it complete/incomplete
 - Changes are instantly saved to your browser's localStorage
 
 ### Understanding Statistics
 - **Current Streak**: Consecutive completed days ending today (or yesterday if you skipped today)
 - **Best Streak**: Your longest consecutive completion streak ever
-- **Completed**: Total days this habit was marked done
-- **Success %**: Completion percentage since you created the habit
+- **Completed**: Total days this task was marked done
+- **Success %**: Completion percentage since you created the task
 
 ### Deleting a Habit
 - Tap the "✕" button on any habit card
