@@ -18,17 +18,55 @@
         <main class="main-content">
             <!-- Add Habit Section -->
             <section class="add-habit-section">
-                <div class="input-group">
-                    <input 
-                        type="text" 
-                        id="habitInput" 
-                        class="habit-input" 
-                        placeholder="Add a new habit..." 
-                        aria-label="New habit name"
-                    >
-                    <button id="addHabitBtn" class="btn btn-primary" aria-label="Add habit">
-                        <span class="btn-icon">+</span>
-                    </button>
+                <div id="addHabitForm" class="add-habit-form">
+                    <div class="input-group">
+                        <input 
+                            type="text" 
+                            id="habitInput" 
+                            class="habit-input" 
+                            placeholder="Add a new habit..." 
+                            aria-label="New habit name"
+                        >
+                        <button id="addHabitBtn" class="btn btn-primary" aria-label="Add habit">
+                            <span class="btn-icon">+</span>
+                        </button>
+                    </div>
+
+                    <!-- Expanded form (hidden by default) -->
+                    <div id="expandedForm" class="expanded-form" style="display: none;">
+                        <div class="form-group">
+                            <label for="startDate" class="form-label">Start Date *</label>
+                            <input 
+                                type="date" 
+                                id="startDate" 
+                                class="form-input" 
+                                aria-label="Habit start date"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="endDate" class="form-label">End Date *</label>
+                            <input 
+                                type="date" 
+                                id="endDate" 
+                                class="form-input" 
+                                aria-label="Habit end date"
+                                required
+                            >
+                        </div>
+
+                        <div id="dateError" class="form-error" style="display: none;"></div>
+
+                        <div class="form-actions">
+                            <button id="confirmAddBtn" class="btn btn-primary" aria-label="Confirm add habit">
+                                Create Habit
+                            </button>
+                            <button id="cancelAddBtn" class="btn btn-secondary" aria-label="Cancel adding habit">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -46,12 +84,25 @@
 
     <!-- Habit Template (hidden, used for cloning) -->
     <template id="habitTemplate">
-        <div class="habit-card">
+            <div class="habit-card">
             <div class="habit-header">
                 <h2 class="habit-name"></h2>
                 <button class="btn btn-delete" aria-label="Delete habit">
                     <span class="btn-icon">✕</span>
                 </button>
+            </div>
+
+            <!-- Habit Dates and Status -->
+            <div class="habit-dates-section">
+                <div class="date-info">
+                    <span class="date-label">Start:</span>
+                    <span class="habit-start-date"></span>
+                </div>
+                <div class="date-info">
+                    <span class="date-label">End:</span>
+                    <span class="habit-end-date"></span>
+                </div>
+                <div class="habit-status-badge"></div>
             </div>
 
             <div class="habit-stats">
@@ -80,11 +131,14 @@
                 </div>
             </div>
 
-            <!-- Last 21 Days View -->
+            <!-- Days View -->
             <div class="days-view">
-                <p class="days-label">Last 21 days</p>
+                <p class="days-label">Progress</p>
                 <div class="days-grid"></div>
             </div>
+
+            <!-- Status Message -->
+            <div class="habit-status-message"></div>
 
             <!-- Today's Toggle -->
             <div class="today-toggle">

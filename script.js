@@ -2,12 +2,19 @@
  * Consistency Tracker - Main Application Script
  * 
  * Features:
- * - Create and manage daily habits
- * - Track completion streaks
+ * - Create and manage daily habits with start/end dates
+ * - Track completion streaks within date ranges
  * - Calculate statistics (completion %, best streak, etc.)
  * - Persist data to localStorage
  * - Mobile-first responsive design
  */
+
+// ===================================
+// CONSTANTS
+// ===================================
+
+const STORAGE_KEY = 'consistency-tracker-habits';
+const MAX_HABIT_DURATION_DAYS = 90;
 
 // ===================================
 // DATA MANAGEMENT
@@ -18,12 +25,12 @@
  * {
  *   id: unique identifier
  *   name: habit name
+ *   startDate: date string (YYYY-MM-DD format)
+ *   endDate: date string (YYYY-MM-DD format)
  *   createdAt: timestamp when habit was created
- *   completedDates: array of date strings (YYYY-MM-DD format)
+ *   completionDates: array of date strings (YYYY-MM-DD format)
  * }
  */
-
-const STORAGE_KEY = 'consistency-tracker-habits';
 
 /**
  * Get all habits from localStorage
@@ -63,19 +70,95 @@ function getDateFromString(dateStr) {
 }
 
 /**
- * Create a new habit
+ * Calculate days difference between two date strings
  */
-function createHabit(name) {
+function calculateDaysDifference(startStr, endStr) {
+    const start = getDateFromString(startStr);
+    const end = getDateFromString(endStr);
+    return Math.floor((end - start) / (1000 * 60 * 60 * 24));
+}
+
+/**
+ * Add N days to a date string
+ */
+function addDaysToDate(dateStr, days) {
+    const date = getDateFromString(dateStr);
+    date.setDate(date.getDate() + days);
+    return getDateString(date);
+}
+
+/**
+ * Validate date range for habit creation
+ * Returns: { valid: boolean, error: string }
+ */
+function validateDateRange(startDateStr, endDateStr) {
+    const start = getDateFromString(startDateStr);
+    const end = getDateFromString(endDateStr);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Check if end date is after start date
+    if (end <= start) {
+        return { valid: false, error: 'End date must be after start date' };
+    }
+
+    // Check maximum duration (90 days)
+    const daysDiff = calculateDaysDifference(startDateStr, endDateStr);
+    if (daysDiff > MAX_HABIT_DURATION_DAYS) {
+        return { 
+            valid: false, 
+            error: `Maximum duration is ${MAX_HABIT_DURATION_DAYS} days. Your range is ${daysDiff} days.` 
+        };
+    }
+
+    return { valid: true, error: '' };
+}
+
+/**
+ * Migrate existing habits without dates
+ */
+function migrateHabits() {
+    const habits = getHabits();
+    const today = getTodayDateString();
+    const endDate = addDaysToDate(today, 21);
+    
+    const updated = habits.map(habit => {
+        if (!habit.startDate || !habit.endDate) {
+            return {
+                ...habit,
+                startDate: today,
+                endDate: endDate
+            };
+        }
+        return habit;
+    });
+
+    if (JSON.stringify(habits) !== JSON.stringify(updated)) {
+        saveHabits(updated);
+    }
+}
+
+/**
+ * Create a new habit with date range
+ */
+function createHabit(name, startDateStr, endDateStr) {
+    const validation = validateDateRange(startDateStr, endDateStr);
+    if (!validation.valid) {
+        return { success: false, error: validation.error };
+    }
+
     const habits = getHabits();
     const newHabit = {
         id: Date.now().toString(),
         name: name.trim(),
+        startDate: startDateStr,
+        endDate: endDateStr,
         createdAt: new Date().toISOString(),
-        completedDates: []
+        completionDates: []
     };
     habits.push(newHabit);
     saveHabits(habits);
-    return newHabit;
+    return { success: true, habit: newHabit };
 }
 
 /**
@@ -96,11 +179,11 @@ function toggleHabitCompletion(habitId, dateStr) {
     
     if (!habit) return;
     
-    const index = habit.completedDates.indexOf(dateStr);
+    const index = habit.completionDates.indexOf(dateStr);
     if (index > -1) {
-        habit.completedDates.splice(index, 1);
+        habit.completionDates.splice(index, 1);
     } else {
-        habit.completedDates.push(dateStr);
+        habit.completionDates.push(dateStr);
     }
     
     saveHabits(habits);
@@ -110,7 +193,65 @@ function toggleHabitCompletion(habitId, dateStr) {
  * Check if a habit was completed on a specific date
  */
 function isHabitCompletedOnDate(habit, dateStr) {
-    return habit.completedDates.includes(dateStr);
+    return habit.completionDates.includes(dateStr);
+}
+
+/**
+ * Check if a date is within habit's date range
+ */
+function isDateWithinRange(habit, dateStr) {
+    return dateStr >= habit.startDate && dateStr <= habit.endDate;
+}
+
+// ===================================
+// HABIT STATUS
+// ===================================
+
+/**
+ * Get habit status: 'not-started', 'active', or 'completed'
+ */
+function getHabitStatus(habit) {
+    const today = getTodayDateString();
+    
+    if (today < habit.startDate) {
+        return 'not-started';
+    } else if (today > habit.endDate) {
+        return 'completed';
+    } else {
+        return 'active';
+    }
+}
+
+/**
+ * Get status badge text and color
+ */
+function getStatusBadgeInfo(status) {
+    const badges = {
+        'not-started': { text: 'Not Started', class: 'badge-not-started' },
+        'active': { text: 'Active', class: 'badge-active' },
+        'completed': { text: 'Completed', class: 'badge-completed' }
+    };
+    return badges[status] || badges['active'];
+}
+
+/**
+ * Get status message for display
+ */
+function getStatusMessage(habit) {
+    const status = getHabitStatus(habit);
+    const today = getTodayDateString();
+    
+    if (status === 'not-started') {
+        const startDate = getDateFromString(habit.startDate);
+        return `Starts on ${startDate.toLocaleDateString()}`;
+    } else if (status === 'completed') {
+        const endDate = getDateFromString(habit.endDate);
+        return `Ended on ${endDate.toLocaleDateString()}`;
+    } else {
+        const endDate = getDateFromString(habit.endDate);
+        const daysLeft = calculateDaysDifference(today, habit.endDate) + 1;
+        return `${daysLeft} day${daysLeft !== 1 ? 's' : ''} remaining`;
+    }
 }
 
 // ===================================
@@ -118,8 +259,7 @@ function isHabitCompletedOnDate(habit, dateStr) {
 // ===================================
 
 /**
- * Calculate current streak for a habit
- * Streak counts consecutive completed days ending today or yesterday
+ * Calculate current streak for a habit (within date range)
  */
 function calculateCurrentStreak(habit) {
     let streak = 0;
@@ -128,6 +268,12 @@ function calculateCurrentStreak(habit) {
     
     while (true) {
         const dateStr = getDateString(currentDate);
+        
+        // Stop if outside habit date range
+        if (!isDateWithinRange(habit, dateStr)) {
+            break;
+        }
+        
         if (isHabitCompletedOnDate(habit, dateStr)) {
             streak++;
             currentDate.setDate(currentDate.getDate() - 1);
@@ -140,13 +286,16 @@ function calculateCurrentStreak(habit) {
 }
 
 /**
- * Calculate longest streak for a habit
+ * Calculate longest streak for a habit (within date range)
  */
 function calculateLongestStreak(habit) {
-    if (habit.completedDates.length === 0) return 0;
+    const datesInRange = habit.completionDates.filter(date => 
+        isDateWithinRange(habit, date)
+    );
     
-    // Sort dates in ascending order
-    const sortedDates = [...habit.completedDates].sort();
+    if (datesInRange.length === 0) return 0;
+    
+    const sortedDates = [...datesInRange].sort();
     
     let maxStreak = 1;
     let currentStreak = 1;
@@ -155,7 +304,6 @@ function calculateLongestStreak(habit) {
         const prevDate = getDateFromString(sortedDates[i - 1]);
         const currDate = getDateFromString(sortedDates[i]);
         
-        // Check if dates are consecutive
         const dayDiff = (currDate - prevDate) / (1000 * 60 * 60 * 24);
         
         if (dayDiff === 1) {
@@ -170,42 +318,47 @@ function calculateLongestStreak(habit) {
 }
 
 /**
- * Calculate total completed days
+ * Calculate total completed days within date range
  */
 function calculateTotalCompleted(habit) {
-    return habit.completedDates.length;
+    return habit.completionDates.filter(date => 
+        isDateWithinRange(habit, date)
+    ).length;
 }
 
 /**
- * Calculate completion percentage
- * Based on days since habit creation
+ * Calculate completion percentage (based on days in range)
  */
 function calculateCompletionPercentage(habit) {
-    const createdDate = new Date(habit.createdAt);
-    const today = new Date();
+    const daysDiff = calculateDaysDifference(habit.startDate, habit.endDate) + 1;
     
-    // Calculate days since creation
-    const daysSinceCreation = Math.floor((today - createdDate) / (1000 * 60 * 60 * 24)) + 1;
+    if (daysDiff === 0) return 0;
     
-    if (daysSinceCreation === 0) return 0;
-    
-    const completedDays = habit.completedDates.length;
-    const percentage = Math.round((completedDays / daysSinceCreation) * 100);
+    const completedDays = calculateTotalCompleted(habit);
+    const percentage = Math.round((completedDays / daysDiff) * 100);
     
     return Math.min(percentage, 100);
 }
 
 /**
- * Get last N days as array of date strings
+ * Get days to display (capped at 21 days or the range, whichever is smaller)
  */
-function getLastNDays(n) {
-    const days = [];
-    const today = new Date();
+function getDaysToDisplay(habit) {
+    const daysDiff = calculateDaysDifference(habit.startDate, habit.endDate) + 1;
+    const daysToShow = Math.min(21, daysDiff);
     
-    for (let i = n - 1; i >= 0; i--) {
-        const date = new Date(today);
+    const days = [];
+    const endDate = getDateFromString(habit.endDate);
+    
+    for (let i = daysToShow - 1; i >= 0; i--) {
+        const date = new Date(endDate);
         date.setDate(date.getDate() - i);
-        days.push(getDateString(date));
+        const dateStr = getDateString(date);
+        
+        // Only include if within habit range
+        if (isDateWithinRange(habit, dateStr)) {
+            days.push(dateStr);
+        }
     }
     
     return days;
@@ -217,9 +370,38 @@ function getLastNDays(n) {
 
 const habitInput = document.getElementById('habitInput');
 const addHabitBtn = document.getElementById('addHabitBtn');
+const startDateInput = document.getElementById('startDate');
+const endDateInput = document.getElementById('endDate');
+const confirmAddBtn = document.getElementById('confirmAddBtn');
+const cancelAddBtn = document.getElementById('cancelAddBtn');
+const dateError = document.getElementById('dateError');
+const expandedForm = document.getElementById('expandedForm');
 const habitsList = document.getElementById('habitsList');
 const emptyState = document.getElementById('emptyState');
 const habitTemplate = document.getElementById('habitTemplate');
+
+/**
+ * Set default dates on form open
+ */
+function setDefaultDates() {
+    const today = getTodayDateString();
+    const defaultEnd = addDaysToDate(today, 21);
+    
+    startDateInput.value = today;
+    endDateInput.value = defaultEnd;
+    dateError.style.display = 'none';
+}
+
+/**
+ * Toggle expanded form visibility
+ */
+function toggleExpandedForm(show) {
+    expandedForm.style.display = show ? 'block' : 'none';
+    if (show) {
+        setDefaultDates();
+        habitInput.focus();
+    }
+}
 
 /**
  * Render all habits
@@ -227,7 +409,6 @@ const habitTemplate = document.getElementById('habitTemplate');
 function renderHabits() {
     const habits = getHabits();
     
-    // Clear existing habits
     habitsList.innerHTML = '';
     
     if (habits.length === 0) {
@@ -249,8 +430,26 @@ function renderHabit(habit) {
     const card = habitTemplate.content.cloneNode(true);
     const cardElement = card.querySelector('.habit-card');
     
+    const status = getHabitStatus(habit);
+    const badgeInfo = getStatusBadgeInfo(status);
+    const statusMessage = getStatusMessage(habit);
+    
     // Set habit name
     card.querySelector('.habit-name').textContent = habit.name;
+    
+    // Set dates
+    card.querySelector('.habit-start-date').textContent = 
+        getDateFromString(habit.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    card.querySelector('.habit-end-date').textContent = 
+        getDateFromString(habit.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    
+    // Set status badge
+    const statusBadge = card.querySelector('.habit-status-badge');
+    statusBadge.textContent = badgeInfo.text;
+    statusBadge.className = 'habit-status-badge ' + badgeInfo.class;
+    
+    // Set status message
+    card.querySelector('.habit-status-message').textContent = statusMessage;
     
     // Calculate and display stats
     const currentStreak = calculateCurrentStreak(habit);
@@ -267,16 +466,17 @@ function renderHabit(habit) {
     const progressFill = card.querySelector('.progress-fill');
     progressFill.style.width = completionPercent + '%';
     
-    // Render last 21 days
+    // Render days grid
     const daysGrid = card.querySelector('.days-grid');
-    const last21Days = getLastNDays(21);
+    const daysToShow = getDaysToDisplay(habit);
+    const today = getTodayDateString();
     
-    last21Days.forEach(dateStr => {
+    daysToShow.forEach(dateStr => {
         const dayBox = document.createElement('div');
         dayBox.className = 'day-box';
         
         const isCompleted = isHabitCompletedOnDate(habit, dateStr);
-        const isMissed = !isCompleted;
+        const isToday = dateStr === today;
         
         if (isCompleted) {
             dayBox.classList.add('completed');
@@ -286,13 +486,19 @@ function renderHabit(habit) {
             dayBox.textContent = '·';
         }
         
-        dayBox.setAttribute('data-date', dateStr);
+        if (isToday) {
+            dayBox.classList.add('today');
+        }
         
-        // Click to toggle completion on past dates
+        dayBox.setAttribute('data-date', dateStr);
         dayBox.style.cursor = 'pointer';
+        
         dayBox.addEventListener('click', () => {
-            toggleHabitCompletion(habit.id, dateStr);
-            renderHabits();
+            // Only allow toggling if within date range
+            if (isDateWithinRange(habit, dateStr)) {
+                toggleHabitCompletion(habit.id, dateStr);
+                renderHabits();
+            }
         });
         
         daysGrid.appendChild(dayBox);
@@ -300,13 +506,16 @@ function renderHabit(habit) {
     
     // Set up today's checkbox
     const todayCheckbox = card.querySelector('.today-checkbox');
-    const today = getTodayDateString();
+    const canToggleToday = isDateWithinRange(habit, today) && status === 'active';
     
-    todayCheckbox.checked = isHabitCompletedOnDate(habit, today);
+    todayCheckbox.checked = canToggleToday && isHabitCompletedOnDate(habit, today);
+    todayCheckbox.disabled = !canToggleToday;
     
     todayCheckbox.addEventListener('change', () => {
-        toggleHabitCompletion(habit.id, today);
-        renderHabits();
+        if (canToggleToday) {
+            toggleHabitCompletion(habit.id, today);
+            renderHabits();
+        }
     });
     
     // Set up delete button
@@ -326,35 +535,61 @@ function renderHabit(habit) {
 // ===================================
 
 /**
- * Add new habit on button click
+ * Open expanded form when clicking add button
  */
-addHabitBtn.addEventListener('click', addNewHabit);
-
-/**
- * Add new habit on Enter key press
- */
-habitInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        addNewHabit();
-    }
+addHabitBtn.addEventListener('click', () => {
+    toggleExpandedForm(true);
 });
 
 /**
- * Clear input focus on mobile after adding
+ * Close expanded form when clicking cancel
  */
-function addNewHabit() {
+cancelAddBtn.addEventListener('click', () => {
+    toggleExpandedForm(false);
+});
+
+/**
+ * Create habit with validation
+ */
+confirmAddBtn.addEventListener('click', () => {
     const habitName = habitInput.value.trim();
+    const startDate = startDateInput.value;
+    const endDate = endDateInput.value;
     
-    if (habitName.length === 0) {
+    if (!habitName) {
         habitInput.focus();
         return;
     }
     
-    createHabit(habitName);
+    if (!startDate || !endDate) {
+        dateError.textContent = 'Please fill in both dates';
+        dateError.style.display = 'block';
+        return;
+    }
+    
+    const result = createHabit(habitName, startDate, endDate);
+    
+    if (!result.success) {
+        dateError.textContent = result.error;
+        dateError.style.display = 'block';
+        return;
+    }
+    
     habitInput.value = '';
+    toggleExpandedForm(false);
     renderHabits();
-    habitInput.focus();
-}
+});
+
+/**
+ * Allow Enter key to submit in habit input
+ */
+habitInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        if (expandedForm.style.display === 'none') {
+            addHabitBtn.click();
+        }
+    }
+});
 
 // ===================================
 // INITIALIZATION
@@ -364,16 +599,17 @@ function addNewHabit() {
  * Initialize the app on page load
  */
 function initApp() {
-    renderHabits();
+    // Migrate existing habits without dates
+    migrateHabits();
     
-    // Set focus to input for better UX
+    renderHabits();
     habitInput.focus();
 }
 
 // Start the app
 document.addEventListener('DOMContentLoaded', initApp);
 
-// Handle visibility change to refresh stats (for accuracy when returning to app)
+// Handle visibility change to refresh stats
 document.addEventListener('visibilitychange', () => {
     if (!document.hidden) {
         renderHabits();
